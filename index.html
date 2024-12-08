@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Динамическое добавление полей</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .input-row {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    input {
+      margin-right: 10px;
+      padding: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .output {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Добавление строк с полями</h1>
+  
+  <div id="inputsContainer"></div>
+
+  <div class="output">
+    <div>Материал: <span id="materialOutput">0</span></div>
+    <div>Квадратура: <span id="squareOutput">0</span></div>
+    <div>Погонные метры: <span id="linearOutput">0</span></div>
+  </div>
+
+  <!-- Кнопки размещаем отдельно, они будут всегда внизу -->
+  <div>
+    <button id="addButton">Добавить поле</button>
+    <button id="calculateButton">Подсчет</button>
+  </div>
+
+  <script>
+    const inputsContainer = document.getElementById('inputsContainer');
+    const materialOutput = document.getElementById('materialOutput');
+    const squareOutput = document.getElementById('squareOutput');
+    const linearOutput = document.getElementById('linearOutput');
+    const addButton = document.getElementById('addButton');
+    const calculateButton = document.getElementById('calculateButton');
+
+    // Функция для создания строки с полями
+    function createInputRow() {
+      // Создаем контейнер для строки ввода
+      const row = document.createElement('div');
+      row.classList.add('input-row');
+
+      // Создаем поле для длины
+      const lengthInput = document.createElement('input');
+      lengthInput.type = 'number';
+      lengthInput.placeholder = 'Длина';
+
+      // Создаем поле для ширины
+      const widthInput = document.createElement('input');
+      widthInput.type = 'number';
+      widthInput.placeholder = 'Ширина';
+
+      // Добавляем поля в строку
+      row.appendChild(lengthInput);
+      row.appendChild(widthInput);
+
+      // Добавляем строку в контейнер (вставляем в конец)
+      inputsContainer.appendChild(row);
+    }
+
+    // Функция подсчета
+    function calculate() {
+      let totalMaterial = 0;
+      let totalSquare = 0;
+      let totalLinear = 0;
+
+      const rows = document.querySelectorAll('.input-row');
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const length = parseFloat(inputs[0].value) || 0;
+        const width = parseFloat(inputs[1].value) || 0;
+
+        // Расчет материала
+        totalMaterial += length * width;
+
+        // Расчет квадратуры и погонных метры
+        if (length < 0.5 || width < 0.5) {
+          // Если одно из значений меньше 0.5, добавляем большее значение в погонные метры
+          if (length < 0.5 && width < 0.5) {
+            totalLinear += Math.max(length, width); // Оба меньше 0.5, берем большее
+          } else {
+            totalLinear += (length < 0.5 ? width : length); // Одно меньше 0.5, добавляем другое
+          }
+        } else {
+          // Если оба значения больше или равны 0.5, вычисляем квадратуру
+          totalSquare += length * width;
+        }
+      });
+
+      // Обновляем значения ячеек
+      materialOutput.textContent = totalMaterial.toFixed(2);
+      squareOutput.textContent = totalSquare.toFixed(2);
+      linearOutput.textContent = totalLinear.toFixed(2);
+    }
+
+    // Обработчик кнопки "Добавить поле"
+    addButton.addEventListener('click', () => {
+      createInputRow(); // Добавить новую строку с полями
+    });
+
+    // Обработчик кнопки "Подсчет"
+    calculateButton.addEventListener('click', () => {
+      calculate(); // Выполнить подсчет для всех строк
+    });
+
+    // Изначально добавляем одну строку с полями
+    createInputRow();
+  </script>
+</body>
+</html>
